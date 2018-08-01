@@ -14,6 +14,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 
     @IBOutlet var Map: MKMapView!
     var locationManager: CLLocationManager!
+    var lastLocation: CLLocation!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         locationManager = CLLocationManager()
@@ -27,6 +29,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     func enableMyWhenInUseFeatures() {
         //nothing yet
+        locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
+        locationManager.distanceFilter = 100.0  // In meters.
+        locationManager.startUpdatingLocation()
+        locationManager.pausesLocationUpdatesAutomatically = true
     }
 
     func disableMyLocationBasedFeatures() {
@@ -68,6 +74,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         case .notDetermined, .authorizedAlways:
             break
         }
+    }
+    
+    func locationManager(_ manager: CLLocationManager,  didUpdateLocations locations: [CLLocation]) {
+        lastLocation = locations.last!
+        
+        // Do something with the location.
     }
     
 }
