@@ -11,33 +11,21 @@ import MapKit
 import CoreLocation
 
 class ViewController: UIViewController, CLLocationManagerDelegate {
-
-    @IBOutlet var Map: MKMapView!
-    var locationManager: CLLocationManager!
-    var lastLocation: CLLocation!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         locationManager = CLLocationManager()
         enableBasicLocationServices()
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
-    func enableMyWhenInUseFeatures() {
-        //nothing yet
-        locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
-        locationManager.distanceFilter = 100.0  // In meters.
-        locationManager.startUpdatingLocation()
-        locationManager.pausesLocationUpdatesAutomatically = true
-    }
 
-    func disableMyLocationBasedFeatures() {
-        //nothing yet
-    }
+    @IBOutlet var Map: MKMapView!
+    var locationManager: CLLocationManager!
+    var lastLocation: CLLocation!
     
     func enableBasicLocationServices() {
         locationManager.delegate = self
@@ -76,11 +64,41 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         }
     }
     
-    func locationManager(_ manager: CLLocationManager,  didUpdateLocations locations: [CLLocation]) {
-        lastLocation = locations.last!
-        
-        // Do something with the location.
+    func enableMyWhenInUseFeatures() {
+        //nothing yet
+        locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
+        locationManager.distanceFilter = 100.0  // In meters.
+        locationManager.startUpdatingLocation()
+        locationManager.pausesLocationUpdatesAutomatically = true
+    }
+
+    func disableMyLocationBasedFeatures() {
+        //nothing yet
     }
     
+    func locationManager(_ manager: CLLocationManager,  didUpdateLocations locations: [CLLocation]) {
+        lastLocation = locations.last!
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        if let error = error as? CLError, error.code == .denied {
+            // Location updates are not authorized.
+            locationManager.stopUpdatingLocation()
+            return
+        }
+        // Notify the user of any errors.
+    }
+    
+    func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {
+        print("Failed to initialize GPS: ", error.description)
+    }
+    
+    @IBAction func centerOnUserLocation(_ sender: Any) {
+        //add implementation of centering here
+        let center = CLLocationCoordinate2D(latitude: lastLocation.coordinate.latitude, longitude: lastLocation.coordinate.longitude)
+        let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+        Map.showsUserLocation = true
+        self.Map.setRegion(region, animated: true)
+    }
 }
 
