@@ -16,6 +16,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         super.viewDidLoad()
         locationManager = CLLocationManager()
         enableBasicLocationServices()
+        centerOnUser(location: locationManager.location!)
     }
     
     override func didReceiveMemoryWarning() {
@@ -29,7 +30,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     func enableBasicLocationServices() {
         locationManager.delegate = self
-        
+        Map.showsUserLocation = true
         switch CLLocationManager.authorizationStatus() {
         case .notDetermined:
             // Request when-in-use authorization initially
@@ -73,7 +74,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
 
     func disableMyLocationBasedFeatures() {
-        //nothing yet
+        locationManager.stopUpdatingLocation()
+        Map.backgroundColor = UIColor.gray
     }
     
     func locationManager(_ manager: CLLocationManager,  didUpdateLocations locations: [CLLocation]) {
@@ -93,11 +95,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         print("Failed to initialize GPS: ", error.description)
     }
     
-    @IBAction func centerOnUserLocation(_ sender: Any) {
-        //add implementation of centering here
-        let center = CLLocationCoordinate2D(latitude: lastLocation.coordinate.latitude, longitude: lastLocation.coordinate.longitude)
+    @IBAction func centerOnUserLocationButton(_ sender: Any) {
+        centerOnUser(location: lastLocation)
+    }
+    
+    func centerOnUser(location: CLLocation) {
+        let center = CLLocationCoordinate2D(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
         let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
-        Map.showsUserLocation = true
         self.Map.setRegion(region, animated: true)
     }
 }
